@@ -1,0 +1,23 @@
+#!/usr/bin/env python
+import os
+import sys
+import commands
+
+CURDIR = os.path.dirname(os.path.realpath(__file__))
+PROJECTDIR = os.path.abspath(os.path.join(CURDIR, '..'))
+files = commands.getoutput("git status --short | grep -E '(A|M)' | awk '{ print $2 }' | grep -E '\.py$'")
+
+if files:
+    file_paths = files.split("\n")
+    for file_path in file_paths:
+        with open(os.path.join(PROJECTDIR, file_path), 'r') as f:
+            i = 1
+            for line in f:
+                line = line.replace('\n','')
+                if line.rstrip() != line:
+                    print 'There are trailing spaces in:', file_path, 'refer line:', i
+                    print 'Please run pyfmt and remove trailing spaces on all your changes, before committing..'
+                    sys.exit(1)
+                i += 1
+
+sys.exit()
